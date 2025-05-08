@@ -69,11 +69,64 @@ int load_rom(char* name){
     return -1;
   }
 
-  fread(memory, 1, sizeof(memory) - 0x200, file);
+  int size = fread(memory, 1, sizeof(memory) - 0x200, file);
+
+  fclose(file);
+
+  if(size == sizeof(memory - 0x200)){
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
-void run_rom(){
-  //Load the rom
-  int load = load_rom("")
-}
+void run_cycle(){
+  //Each instruction is 0xyn, where x and y are values for Vx and Vy
+  unsigned short instruction = memory[pc] << 8 | memory[pc + 1];
+  pc += 2;
+  
+  //Extracting Vx and Vy which may or may not be used
+  unsigned short x = V[instruction & 0x0F00];
+  unsigned short y = V[instruction & 0x00F0];
 
+  //Extracting nibbles (values that instructions may use)
+  unsigned short n = instruction & 0x000F;
+  unsigned short nn = instruction & 0x00FF;
+  unsigned short nnn = instruction & 0x0FFF;
+
+  switch (instruction & 0xF000) { //Getting the nibble to determine the instruction type 
+    case 0x0000:
+      switch (instruction & 0x00FF){
+        case 0x00E0: //Clear the display
+          for(int i = 0; i < 64 * 32; i++){
+            display[i] = 0;
+          }
+          break;
+        case 0x00EE: //Return from subroutine
+          pc = stack[sp];
+          sp -= 1;
+          break;
+      }
+    case 0x1000: //Jump to address NNN
+      pc = nnn;
+      break;
+    case 0x6000: //Set x register to NN
+      V[x] = nn;
+      break;
+    case 0x7000: //Add NN to x register
+      V[x] += nn;
+      break;
+    case 0xA000: //Set I register to NNN
+      I = nnn;
+      break;
+    //TODO: case 0xD000: Display sprite n starting at memory location I at (Vx, Vy), if theres a collision, set VF to one 
+      
+      
+
+  }
+
+
+
+
+
+}
