@@ -63,8 +63,8 @@ unsigned char fontset[80] = {
 
 int load_rom(char* name){
   FILE* file;
-  file = fopen("name", "rb");
-
+  file = fopen(name, "rb");
+  
   if(file == NULL){
     return -1;
   }

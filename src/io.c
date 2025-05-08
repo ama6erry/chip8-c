@@ -3,18 +3,20 @@
 #include <stdbool.h>
 #include "chip8.h"
 
-SDL_Windows* window;
+SDL_Window* window;
 SDL_Surface* screenSurface;
 SDL_Renderer* renderer;
 
+int running = 1;
+
 void init_display(){
   SDL_Init(SDL_INIT_VIDEO);
-  window = SDL_CreateWindow("CHIP-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 64*8, 32*8, SDL_WINDOSHOWN);
+  window = SDL_CreateWindow("CHIP-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 64*8, 32*8, SDL_WINDOW_SHOWN);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
 void draw_display(unsigned char* display){
-  SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
   for(int x = 0; x < 64; x++){
     for(int y =0; y < 32; y++){
@@ -30,7 +32,23 @@ void draw_display(unsigned char* display){
     }
   }
 
-  SDL_RenderPresent();
+  SDL_RenderPresent(renderer);
 }
+
+void stop_display(){
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+}
+
+void event_handler(){
+  SDL_Event event;
+  
+  if (SDL_PollEvent(&event)){
+    if(event.type == SDL_QUIT){
+      running = 0;
+    }
+  }
+}
+
 
 
