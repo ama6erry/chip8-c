@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     run_cycle();
     draw_display(display);
     event_handler();
-    usleep(1500*500);
+    usleep(1500);
   }
 
   stop_display();

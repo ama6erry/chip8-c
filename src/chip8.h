@@ -1,7 +1,6 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
-extern unsigned char V[16];
 extern unsigned short I; //I register - Used to store memory addresses
 extern unsigned char dt; //Delay timer - When not 0, decrement at a rate of 60Hz
 extern unsigned char st; //Sound timer - When not 0, decrement at a rate of 60Hz

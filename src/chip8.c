@@ -104,12 +104,15 @@ void run_cycle(){
   //Each instruction is 0xyn, where x and y are values for Vx and Vy
   unsigned short instruction = memory[pc] << 8 | memory[pc + 1];
   pc += 2;
-  debuglog("Current instruction: %x\n", instruction);
+  debuglog("Current instruction: 0x%x\n", instruction);
 
   //Extracting Vx and Vy which may or may not be used
-  unsigned short x = V[instruction & 0x0F00];
-  unsigned short y = V[instruction & 0x00F0];
-
+  unsigned short x = V[(instruction & 0x0F00) >> 8];
+  unsigned short y = V[(instruction & 0x00F0) >> 4];
+  debuglog("register %d value: %d \n", (instruction & 0x0F00) >> 8, x);
+  debuglog("register %d value: %d \n", (instruction & 0x00F0) >> 4, y);
+  
+  
   //Extracting nibbles (values that instructions may use)
   unsigned short n = instruction & 0x000F;
   unsigned short nn = instruction & 0x00FF;
@@ -138,12 +141,12 @@ void run_cycle(){
       pc = nnn;
       break;
     case 0x6000: //Set x register to NN
-      debuglog("setting register\n");
-      V[instruction & 0x0F00] = nn;
+      debuglog("setting register %d to %d\n", (instruction & 0x0F00) >> 8, nn);
+      V[(instruction & 0x0F00) >> 8] = nn;
       break;
     case 0x7000: //Add NN to x register
-      debuglog("adding to register\n");
-      V[instruction & 0x0F00] += nn;
+      debuglog("adding %d register %d\n", nn, (instruction & 0x0F00) >> 8);
+      V[(instruction & 0x0F00) >> 8] += nn;
       break;
     case 0xA000: //Set I register to NNN
       debuglog("setting i register\n");
@@ -162,10 +165,10 @@ void run_cycle(){
         byte = memory[count + j];
         for(int k = 0; k < 8; k++){
           if((byte >> (7-k) & 0x01) > 0){
-            if (display[x+k][y+j] == 1){
+           if (display[x+k][y+j] == 1){
               V[0xF] = 1;
             }
-
+            debuglog("y level %d", y + k);
             display[x + k][y + j] ^= 1;
           }
         }
