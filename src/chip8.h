@@ -20,6 +20,7 @@ extern unsigned char fontset[80];
 
 int load_rom(char* name);
 void run_cycle();
+void debuglog();
 
 #endif // !CHIP8_H
 

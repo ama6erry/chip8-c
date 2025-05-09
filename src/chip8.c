@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 /*
  +---------------+= 0xFFF (4095) End of Chip-8 RAM
@@ -27,7 +28,7 @@
 
 
 //Declaring registers
-unsigned char V[16] = {0}; //Vx - The 16 standard registers that programs can use, however VF (Register 16) is reserved as a flag used by some instructions
+unsigned char V[0xF] = {0}; //Vx - The 16 standard registers that programs can use, however VF (Register 16) is reserved as a flag used by some instructions
 unsigned short I = 0; //I register - Used to store memory addresses
 unsigned char dt = 0; //Delay timer - When not 0, decrement at a rate of 60Hz
 unsigned char st = 0; //Sound timer - When not 0, decrement at a rate of 60Hz
@@ -61,6 +62,18 @@ unsigned char fontset[80] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80   // F
 };
 
+const int debug = 1;
+
+void debuglog(const char *format, ...){
+  if(debug){
+    va_list args;
+
+    va_start (args, format);
+    vfprintf(stdout, format, args);
+    va_end (args);
+  }
+}
+
 int load_rom(char* name){
   FILE* file;
   file = fopen(name, "rb");
@@ -75,8 +88,10 @@ int load_rom(char* name){
 
   if(size == sizeof(memory - 0x200)){
     return 0;
+    debuglog("file %s loaded, size = %d\n", name, size);
   } else {
     return 1;
+    debuglog("file %s loaded though appears to be incorrect size? size = %d\n", name, size);
   }
 }
 
@@ -84,7 +99,8 @@ void run_cycle(){
   //Each instruction is 0xyn, where x and y are values for Vx and Vy
   unsigned short instruction = memory[pc] << 8 | memory[pc + 1];
   pc += 2;
-  
+  debuglog("Current instruction: %x\n", instruction);
+
   //Extracting Vx and Vy which may or may not be used
   unsigned short x = V[instruction & 0x0F00];
   unsigned short y = V[instruction & 0x00F0];
@@ -98,29 +114,52 @@ void run_cycle(){
     case 0x0000:
       switch (instruction & 0x00FF){
         case 0x00E0: //Clear the display
+          debuglog("clearing display\n");
           for(int i = 0; i < 64 * 32; i++){
             display[i] = 0;
           }
           break;
         case 0x00EE: //Return from subroutine
+          debuglog("returning from subroutine\n");
           pc = stack[sp];
           sp -= 1;
           break;
       }
     case 0x1000: //Jump to address NNN
+      debuglog("jumping address\n");
       pc = nnn;
       break;
     case 0x6000: //Set x register to NN
-      V[x] = nn;
+      debuglog("setting register\n");
+      V[instruction & 0x0F00] = nn;
       break;
     case 0x7000: //Add NN to x register
-      V[x] += nn;
+      debuglog("adding to register\n");
+      V[instruction & 0x0F00] += nn;
       break;
     case 0xA000: //Set I register to NNN
+      debuglog("setting i register\n");
       I = nnn;
       break;
-    //TODO: case 0xD000: Display sprite n starting at memory location I at (Vx, Vy), if theres a collision, set VF to one 
-      
+    case 0xD000: //Display sprite n-byte starting at memory location I at (Vx, Vy), if theres a collision, set VF to one
+      V[0xF] = 0;
+      unsigned short count = I;
+      unsigned char byte;
+      debuglog("drawing sprite\n");
+      for(int j = 0; j < n; j++){
+        byte = memory[count + j];
+        for(int k = 0; k < 8; k++){
+          if((byte >> (7-k)) == 1){
+            if (display[(x + k)*32 + (y + j)] == 1){
+              V[0xF] = 1;
+            }
+
+            display[(x + k)*32 + (y + j)] ^= 1;
+          }
+        }
+      }
+      pc += 2;
+      break;
       
 
   }
