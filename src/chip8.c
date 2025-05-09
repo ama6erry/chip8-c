@@ -63,6 +63,8 @@ unsigned char fontset[80] = {
 };
 
 const int debug = 1;
+const int step_through = 1;
+
 
 void debuglog(const char *format, ...){
   if(debug){
@@ -82,8 +84,10 @@ int load_rom(char* name){
     return -1;
   }
 
-  int size = fread(memory, 1, sizeof(memory) - 0x200, file);
-
+  int size = fread(memory + 0x200, 1, sizeof(memory) - 0x200, file);
+  
+  debuglog("file size %d\n", size);
+  
   fclose(file);
 
   if(size == sizeof(memory - 0x200)){
@@ -125,6 +129,7 @@ void run_cycle(){
           sp -= 1;
           break;
       }
+      break;
     case 0x1000: //Jump to address NNN
       debuglog("jumping address\n");
       pc = nnn;

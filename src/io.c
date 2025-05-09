@@ -27,6 +27,7 @@ void draw_display(unsigned char* display){
         pixel.x = x*8;
         pixel.y = y*8;
 
+        SDL_RenderFillRect(renderer, &pixel);
         SDL_RenderDrawRect(renderer, &pixel);
       }
     }
