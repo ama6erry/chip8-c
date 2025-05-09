@@ -8,6 +8,7 @@ SDL_Surface* screenSurface;
 SDL_Renderer* renderer;
 
 int running = 1;
+int draw_flag = 0;
 
 void init_display(){
   SDL_Init(SDL_INIT_VIDEO);
@@ -15,25 +16,28 @@ void init_display(){
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
-void draw_display(unsigned char* display){
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+void draw_display(unsigned char display[64][32]){
+  if(draw_flag){
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-  for(int x = 0; x < 64; x++){
-    for(int y =0; y < 32; y++){
-      if(display[x*32 + y] == 1){
-        SDL_Rect pixel;
-        pixel.h = 8;
-        pixel.w = 8;
-        pixel.x = x*8;
-        pixel.y = y*8;
+    for(int y = 0; y < 32; y++){
+      for(int x = 0; x < 64; x++){
+        if(display[x][y] == 1){
+          SDL_Rect pixel;
+          pixel.h = 8;
+          pixel.w = 8;
+          pixel.x = x*8;
+          pixel.y = y*8;
 
-        SDL_RenderFillRect(renderer, &pixel);
-        SDL_RenderDrawRect(renderer, &pixel);
+          SDL_RenderFillRect(renderer, &pixel);
+          SDL_RenderDrawRect(renderer, &pixel);
+        }
       }
     }
-  }
 
-  SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer);
+  }
+  draw_flag = 0;
 }
 
 void stop_display(){

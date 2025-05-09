@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include "io.h"
 
 /*
  +---------------+= 0xFFF (4095) End of Chip-8 RAM
@@ -40,7 +41,7 @@ unsigned char sp = 0; //Stack pointer - points to the top of the stack
 //Other
 unsigned short stack[16] = {0};
 unsigned char memory[4096] = {0};
-unsigned char display[64*32] = {0};
+unsigned char display[64][32] = {0};
 
 // Font set
 unsigned char fontset[80] = {
@@ -119,8 +120,10 @@ void run_cycle(){
       switch (instruction & 0x00FF){
         case 0x00E0: //Clear the display
           debuglog("clearing display\n");
-          for(int i = 0; i < 64 * 32; i++){
-            display[i] = 0;
+          for(int i = 0; i < 64; i++){
+            for(int s = 0; s < 32; s++){
+              display[i][s] = 0;
+            }
           }
           break;
         case 0x00EE: //Return from subroutine
@@ -148,22 +151,25 @@ void run_cycle(){
       break;
     case 0xD000: //Display sprite n-byte starting at memory location I at (Vx, Vy), if theres a collision, set VF to one
       V[0xF] = 0;
+      draw_flag = 1;
       unsigned short count = I;
       unsigned char byte;
       debuglog("drawing sprite\n");
+      debuglog("loops %d times\n", n);
+      debuglog("Staring at (%d, %d)", x, y);
       for(int j = 0; j < n; j++){
+        printf("drawing\n");
         byte = memory[count + j];
         for(int k = 0; k < 8; k++){
-          if((byte >> (7-k)) == 1){
-            if (display[(x + k)*32 + (y + j)] == 1){
+          if((byte >> (7-k) & 0x01) > 0){
+            if (display[x+k][y+j] == 1){
               V[0xF] = 1;
             }
 
-            display[(x + k)*32 + (y + j)] ^= 1;
+            display[x + k][y + j] ^= 1;
           }
         }
       }
-      pc += 2;
       break;
       
 
