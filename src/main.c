@@ -2,14 +2,42 @@
 #include "io.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
-  if(argc == 1){
-    printf("Invalid parameters, have rom file name as parameter \n");
-    return 0;
+
+  int opt;
+  int file_flag = 0;
+  int result;
+  char file_path[512];
+
+  while((opt = getopt(argc, argv, "df:s:")) != -1) {
+    switch (opt){
+      case 'd':
+        printf("Debug mode on \n");
+        debug = 1;
+        break;
+      case 'f':
+        file_flag = 1;
+        strcpy(file_path, optarg);
+        break;
+      case 's':
+        display_scale = atoi(optarg);
+        break;
+    }
   }
-  if(load_rom(argv[1]) == -1){
+
+  if(file_flag){
+    result = load_rom(file_path);
+  } else {
+    printf("Please enter the file path to the rom: \n");
+    scanf("%s", file_path);
+    result = load_rom(file_path);
+  }
+
+  if(result == -1){
     printf("File not found\n");
     return 0;
   }

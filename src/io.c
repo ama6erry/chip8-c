@@ -9,10 +9,11 @@ SDL_Renderer* renderer;
 
 int running = 1;
 int draw_flag = 0;
+int display_scale = 8;
 
 void init_display(){
   SDL_Init(SDL_INIT_VIDEO);
-  window = SDL_CreateWindow("CHIP-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 64*8, 32*8, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow("CHIP-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 64*display_scale, 32*display_scale, SDL_WINDOW_SHOWN);
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 }
 
@@ -24,10 +25,10 @@ void draw_display(unsigned char display[64][32]){
       for(int x = 0; x < 64; x++){
         if(display[x][y] == 1){
           SDL_Rect pixel;
-          pixel.h = 8;
-          pixel.w = 8;
-          pixel.x = x*8;
-          pixel.y = y*8;
+          pixel.h = display_scale;
+          pixel.w = display_scale;
+          pixel.x = x*display_scale;
+          pixel.y = y*display_scale;
 
           SDL_RenderFillRect(renderer, &pixel);
           SDL_RenderDrawRect(renderer, &pixel);

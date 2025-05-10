@@ -17,6 +17,8 @@ extern unsigned char display[64][32];
 // Font set
 extern unsigned char fontset[80];
 
+extern int debug;
+
 int load_rom(char* name);
 void run_cycle();
 void debuglog();

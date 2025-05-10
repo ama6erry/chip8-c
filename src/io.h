@@ -8,5 +8,6 @@ void event_handler();
 
 extern int running;
 extern int draw_flag;
+extern int display_scale;
 
 #endif // IO_H

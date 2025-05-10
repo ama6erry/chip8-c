@@ -63,8 +63,8 @@ unsigned char fontset[80] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80   // F
 };
 
-const int debug = 1;
-const int step_through = 1;
+int debug = 0;
+int step_through = 1;
 
 
 void debuglog(const char *format, ...){
@@ -161,7 +161,6 @@ void run_cycle(){
       debuglog("loops %d times\n", n);
       debuglog("Staring at (%d, %d)", x, y);
       for(int j = 0; j < n; j++){
-        printf("drawing\n");
         byte = memory[count + j];
         for(int k = 0; k < 8; k++){
           if((byte >> (7-k) & 0x01) > 0){
