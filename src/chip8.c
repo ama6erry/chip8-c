@@ -140,6 +140,27 @@ void run_cycle(){
       debuglog("jumping address\n");
       pc = nnn;
       break;
+    case 0x2000:
+      debuglog("calling subroutine\n");
+      sp += 1
+      stack[sp] = pc;
+      pc = nnn;
+      break;
+    case 0x3000:
+      if (x == nn){
+        pc += 2;
+      }
+      break;
+    case 0x4000:
+      if (x != nn){
+        pc += 2;
+      }
+      break;
+    case 0x5000:
+      if (x == y){
+        pc += 2;
+      }
+      break;
     case 0x6000: //Set x register to NN
       debuglog("setting register %d to %d\n", (instruction & 0x0F00) >> 8, nn);
       V[(instruction & 0x0F00) >> 8] = nn;
@@ -147,6 +168,32 @@ void run_cycle(){
     case 0x7000: //Add NN to x register
       debuglog("adding %d register %d\n", nn, (instruction & 0x0F00) >> 8);
       V[(instruction & 0x0F00) >> 8] += nn;
+      break;
+    case 0x8000:
+      switch (instruction & 0x000F) {
+        case 0x0000:
+          V[(instruction & 0x0F00) >> 8] = y;
+          break;
+        case 0x0001:
+          V[(instruction & 0x0F00) >> 8] = x | y;
+          break;
+        case 0x0002:
+          V[(instruction & 0x0F00) >> 8] = x & y;
+          break;
+        case 0x0003:
+          V[(instruction & 0x0F00) >> 8] = x ^ y;
+          break;
+        case 0x0004:
+          break;
+        case 0x0005:
+          break;
+        case 0x0006:
+          break;
+        case 0x0007:
+          break;
+        case 0x000E:
+          break;
+      }
       break;
     case 0xA000: //Set I register to NNN
       debuglog("setting i register\n");
