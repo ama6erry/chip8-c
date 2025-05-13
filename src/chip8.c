@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
+#include <stdlib.h>
 #include "io.h"
 
 /*
@@ -66,7 +68,6 @@ unsigned char fontset[80] = {
 int debug = 0;
 int step_through = 1;
 
-
 void debuglog(const char *format, ...){
   if(debug){
     va_list args;
@@ -75,6 +76,11 @@ void debuglog(const char *format, ...){
     vfprintf(stdout, format, args);
     va_end (args);
   }
+}
+
+int random_num(int min, int max){
+  int randnum = rand() % (max - min + 1) + min;
+  return randnum;
 }
 
 int load_rom(char* name){
@@ -184,20 +190,61 @@ void run_cycle(){
           V[(instruction & 0x0F00) >> 8] = x ^ y;
           break;
         case 0x0004:
+          if (((int) x + y) > 0xFF){
+            V[0xF] = 1;
+          } else {
+            V[0xF] = 0;
+          }
+          V[(instruction & 0x0F00) >> 8] += y;
           break;
         case 0x0005:
+          if (x > y){
+            V[0xF] = 1;
+          } else {
+            V[0xF] = 0;
+          }
+          V[(instruction & 0x0F00) >> 8] -= y;
           break;
         case 0x0006:
+          if ((x & 0x01) == 1){
+            V[0xF] = 1;
+          } else {
+            V[0xF] = 0;
+          }
+          V[(instruction & 0x0F00) >> 8] >>= 1;
           break;
         case 0x0007:
+          if (x > y){
+            V[0xF] = 1;
+          } else {
+            V[0xF] = 0;
+          }
+          V[(instruction & 0x0F00) >> 8] = y - V[(instruction & 0x0F00) >> 8];
           break;
         case 0x000E:
+          if ((x & 0x80) == 1){
+            V[0xF] = 1;
+          } else {
+            V[0xF] = 0;
+          }
+          V[(instruction & 0x0F00) >> 8] <<= 1;
           break;
+      }
+      break;
+    case 0x9000:
+      if(x != y){
+        pc += 2;
       }
       break;
     case 0xA000: //Set I register to NNN
       debuglog("setting i register\n");
       I = nnn;
+      break;
+    case 0xB000:
+      pc = nnn + V[0];
+      break;
+    case 0xC000:
+      V[(instruction & 0x0F00) >> 8] = random_num(0, 255) & nn;
       break;
     case 0xD000: //Display sprite n-byte starting at memory location I at (Vx, Vy), if theres a collision, set VF to one
       V[0xF] = 0;
@@ -220,6 +267,8 @@ void run_cycle(){
         }
       }
       break;
+    default:
+      printf("Instruction 0x%x not found", instruction);
       
 
   }
