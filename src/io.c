@@ -48,6 +48,81 @@ void stop_display(){
   SDL_Quit();
 }
 
+//Maps keys
+//1 2 3 C 4 5 6 D 7 8 9 E A 0 B F
+//              ^
+//              |
+//              |
+//1 2 3 4 Q W E R A S D F Z X C V              
+void handle_key_press(SDL_KeyboardEvent e){
+  switch(e.keysym.scancode){
+    case SDL_SCANCODE_1:
+      debuglog("Key 1 pressed\n");
+      keyboard = 0x01;
+      break;
+    case SDL_SCANCODE_2:
+      debuglog("Key 2 pressed\n");
+      keyboard = 0x02;
+      break;
+    case SDL_SCANCODE_3:
+      debuglog("Key 3 pressed\n");
+      keyboard = 0x03;
+      break;
+    case SDL_SCANCODE_4:
+      debuglog("Key 4 pressed\n");
+      keyboard = 0x0C;
+      break;
+    case SDL_SCANCODE_Q:
+      debuglog("Key Q pressed\n");
+      keyboard = 0x04;
+      break;
+    case SDL_SCANCODE_W:
+      debuglog("Key W pressed\n");
+      keyboard = 0x05;
+      break;
+    case SDL_SCANCODE_E:
+      debuglog("Key E pressed\n");
+      keyboard = 0x06;
+      break;
+    case SDL_SCANCODE_R:
+      debuglog("Key R pressed\n");
+      keyboard = 0x0D;
+      break;
+    case SDL_SCANCODE_A:
+      debuglog("Key A pressed\n");
+      keyboard = 0x07;
+      break;
+    case SDL_SCANCODE_S:
+      debuglog("Key S pressed\n");
+      keyboard = 0x08;
+      break;
+    case SDL_SCANCODE_D:
+      debuglog("Key D pressed\n");
+      keyboard = 0x09;
+      break;
+    case SDL_SCANCODE_F:
+      debuglog("Key F pressed\n");
+      keyboard = 0x0E;
+      break;
+    case SDL_SCANCODE_Z:
+      debuglog("Key Z pressed\n");
+      keyboard = 0x0A;
+      break;
+    case SDL_SCANCODE_X:
+      debuglog("Key X pressed\n");
+      keyboard = 0x00;
+      break;
+    case SDL_SCANCODE_C:
+      debuglog("Key C pressed\n");
+      keyboard = 0x0B;
+      break;
+    case SDL_SCANCODE_V:
+      debuglog("Key V pressed\n");
+      keyboard = 0x0F;
+      break;
+  }
+}
+
 void event_handler(){
   SDL_Event event;
 
@@ -63,73 +138,9 @@ void event_handler(){
         keyboard = 0x1F;
         break;
     }
-  }
-  
-  if (SDL_PollEvent(&event)){
-    if(event.type == SDL_QUIT){
-      running = 0;
-    }
-  }
+  }  
 }
 
-//Maps keys
-//1 2 3 C 4 5 6 D 7 8 9 E A 0 B F
-//              ^
-//              |
-//              |
-//1 2 3 4 Q W E R A S D F Z X C V              
-void handle_key_press(SDL_KeyboardEvent e){
-  switch(e.keysym.scancode){
-    case SDL_SCANCODE_1:
-      keyboard = 0x01;
-      break;
-    case SDL_SCANCODE_2:
-      keyboard = 0x02;
-      break;
-    case SDL_SCANCODE_3:
-      keyboard = 0x03;
-      break;
-    case SDL_SCANCODE_4:
-      keyboard = 0x0C;
-      break;
-    case SDL_SCANCODE_Q:
-      keyboard = 0x04;
-      break;
-    case SDL_SCANCODE_W:
-      keyboard = 0x05;
-      break;
-    case SDL_SCANCODE_E:
-      keyboard = 0x06;
-      break;
-    case SDL_SCANCODE_R:
-      keyboard = 0x0D;
-      break;
-    case SDL_SCANCODE_A:
-      keyboard = 0x07;
-      break;
-    case SDL_SCANCODE_S:
-      keyboard = 0x08;
-      break;
-    case SDL_SCANCODE_D:
-      keyboard = 0x09;
-      break;
-    case SDL_SCANCODE_F:
-      keyboard = 0x0E;
-      break;
-    case SDL_SCANCODE_Z:
-      keyboard = 0x0A;
-      break;
-    case SDL_SCANCODE_X:
-      keyboard = 0x00;
-      break;
-    case SDL_SCANCODE_C:
-      keyboard = 0x0B;
-      break;
-    case SDL_SCANCODE_V:
-      keyboard = 0x0F;
-      break;
-  }
-}
 
 
 

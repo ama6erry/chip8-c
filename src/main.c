@@ -43,13 +43,27 @@ int main(int argc, char *argv[])
   }
 
   init_display();
+  if(debug){
+    logfile = fopen("log.txt", "w");
+  }
+
+  memcpy(memory, fontset, sizeof(fontset));
 
   while(running){
+    if(dt > 0){
+      --dt;
+    }
+    if(st > 0){
+      --st;
+    }
     run_cycle();
     draw_display(display);
     event_handler();
-    usleep(1500);
+    usleep(16600);
   }
 
+  if(debug){
+    fclose(logfile);
+  }
   stop_display();
 }

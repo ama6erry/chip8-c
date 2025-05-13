@@ -1,6 +1,6 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-
+#include <stdio.h>
 extern unsigned short I; //I register - Used to store memory addresses
 extern unsigned char dt; //Delay timer - When not 0, decrement at a rate of 60Hz
 extern unsigned char st; //Sound timer - When not 0, decrement at a rate of 60Hz
@@ -18,6 +18,7 @@ extern unsigned char display[64][32];
 extern unsigned char fontset[80];
 
 extern int debug;
+extern FILE* logfile;
 
 int load_rom(char* name);
 void run_cycle();

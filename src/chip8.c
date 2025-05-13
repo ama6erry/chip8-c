@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "io.h"
 
 /*
@@ -67,15 +68,23 @@ unsigned char fontset[80] = {
 
 int debug = 0;
 int step_through = 1;
+FILE* logfile;
 
-void debuglog(const char *format, ...){
+void debuglog(const char* format, ...){
   if(debug){
     va_list args;
+
+    va_start (args, format);
+    if(logfile != NULL){
+      vfprintf(logfile, format, args);
+    }
+    va_end (args);
 
     va_start (args, format);
     vfprintf(stdout, format, args);
     va_end (args);
   }
+
 }
 
 int random_num(int min, int max){
@@ -190,7 +199,7 @@ void run_cycle(){
           V[(instruction & 0x0F00) >> 8] = x ^ y;
           break;
         case 0x0004:
-          if (((int) x + y) > 0xFF){
+          if ((x + y) > 0xFF){
             V[0xF] = 1;
           } else {
             V[0xF] = 0;
@@ -237,7 +246,7 @@ void run_cycle(){
       }
       break;
     case 0xA000: //Set I register to NNN
-      debuglog("setting i register\n");
+      debuglog("setting i register to %d\n", nnn);
       I = nnn;
       break;
     case 0xB000:
@@ -253,7 +262,7 @@ void run_cycle(){
       unsigned char byte;
       debuglog("drawing sprite\n");
       debuglog("loops %d times\n", n);
-      debuglog("Staring at (%d, %d)", x, y);
+      debuglog("Staring at (%d, %d)\n", x, y);
       for(int j = 0; j < n; j++){
         byte = memory[count + j];
         for(int k = 0; k < 8; k++){
@@ -261,16 +270,84 @@ void run_cycle(){
            if (display[x+k][y+j] == 1){
               V[0xF] = 1;
             }
-            debuglog("y level %d", y + k);
             display[x + k][y + j] ^= 1;
           }
         }
       }
       break;
+    case 0xE000:
+      switch(instruction & 0x00FF){
+        case 0x009E:
+          if(keyboard == x){
+            pc += 2;
+          }
+          break;
+        case 0x00A1:
+          if(keyboard != x){
+            pc += 2;
+          }
+          break;
+      }
+      break;
+    case 0xF000:
+      switch(instruction & 0x00FF){
+        case 0x0007:
+          V[(instruction & 0x0F00) >> 8] = dt;
+          break;
+        case 0x000A:
+          do {
+            if(dt > 0){
+              --dt;
+            }
+            if(st > 0){
+              --st;
+            }
+            event_handler();
+            usleep(16600);
+          } while (keyboard == 0x1F);
+          V[(instruction & 0x0F00) >> 8] = keyboard;
+          break;
+        case 0x0015:
+          dt = x;
+          break;
+        case 0x0018:
+          st = x;
+          break;
+        case 0x001E:
+          I += x;
+          debuglog("Adding %d to I register\n", x);
+          break;
+        case 0x0029:
+          I = x * 5;
+          debuglog("setting I to store font %x\n", x);
+          break;
+        case 0x0033:
+          debuglog("determing digits of %d\n", x);
+          for(int i = 3; i > 0; --i){
+            debuglog("digit %d extracted\n", x%10);
+            memory[I + i - 1] = x%10;
+            x /= 10;
+          }
+          break;
+        case 0x0055:
+          debuglog("writing V0 to V%d to memory : starting from memory[%d]\n", (instruction & 0x0F00) >> 8, I);
+          for(int i = 0; i <= ((instruction & 0x0F00) >> 8) ; i++){
+            debuglog("storing contents of register %d at memory location %d\n", i, I+i);
+            memory[I + i] = V[i];
+          }
+          break;
+        case 0x0065:
+          debuglog("writing from memory to V0 to V%d : starting from memory[%d]\n", (instruction & 0x0F00) >> 8, I);
+          for(int i = 0; i <= ((instruction & 0x0F00) >> 8); i++){
+            debuglog("storing contents of memory location %d into register %d\n", I+i, i);
+            V[i] = memory[I + i];
+          }
+          break;
+      }
+      break;
     default:
-      printf("Instruction 0x%x not found", instruction);
-      
-
+      printf("Instruction 0x%x not found\n", instruction);
+      break;
   }
 
 
