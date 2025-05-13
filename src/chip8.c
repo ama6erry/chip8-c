@@ -142,7 +142,7 @@ void run_cycle(){
       break;
     case 0x2000:
       debuglog("calling subroutine\n");
-      sp += 1
+      sp += 1;
       stack[sp] = pc;
       pc = nnn;
       break;
