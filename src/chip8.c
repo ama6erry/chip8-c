@@ -138,6 +138,7 @@ void run_cycle(){
       switch (instruction & 0x00FF){
         case 0x00E0: //Clear the display
           debuglog("clearing display\n");
+          draw_flag = 1;
           for(int i = 0; i < 64; i++){
             for(int s = 0; s < 32; s++){
               display[i][s] = 0;
@@ -209,7 +210,7 @@ void run_cycle(){
         case 0x0005:
           V[(instruction & 0x0F00) >> 8] -= y;
           debuglog("setting register %d to %d - %d\n", (instruction & 0x0F00) >> 8, x, y);
-          if (x > y){
+          if (x >= y){
             debuglog("set flag to 1\n");
             V[0xF] = 1;
           } else {
@@ -265,15 +266,15 @@ void run_cycle(){
       unsigned char byte;
       debuglog("drawing sprite\n");
       debuglog("loops %d times\n", n);
-      debuglog("Staring at (%d, %d)\n", x, y);
+      debuglog("Staring at (%d, %d)\n", x%64, y%32);
       for(int j = 0; j < n; j++){
         byte = memory[count + j];
         for(int k = 0; k < 8; k++){
           if((byte >> (7-k) & 0x01) > 0){
-           if (display[x+k][y+j] == 1){
+           if (display[(x+k)%64][(y+j)%32] == 1){
               V[0xF] = 1;
             }
-            display[x + k][y + j] ^= 1;
+            display[(x + k)%64][(y + j)%32] ^= 1;
           }
         }
       }

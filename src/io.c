@@ -21,26 +21,37 @@ void init_display(){
 
 void draw_display(unsigned char display[64][32]){
   if(draw_flag){
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+  for(int y = 0; y < 32; y++){
+    for(int x = 0; x < 64; x++){
+      if(display[x][y] == 1){
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect pixel;
+        pixel.h = display_scale;
+        pixel.w = display_scale;
+        pixel.x = x*display_scale;
+        pixel.y = y*display_scale;
 
-    for(int y = 0; y < 32; y++){
-      for(int x = 0; x < 64; x++){
-        if(display[x][y] == 1){
-          SDL_Rect pixel;
-          pixel.h = display_scale;
-          pixel.w = display_scale;
-          pixel.x = x*display_scale;
-          pixel.y = y*display_scale;
+        SDL_RenderFillRect(renderer, &pixel);
+        SDL_RenderDrawRect(renderer, &pixel);
+      } else {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-          SDL_RenderFillRect(renderer, &pixel);
-          SDL_RenderDrawRect(renderer, &pixel);
-        }
+        SDL_Rect pixel;
+        pixel.h = display_scale;
+        pixel.w = display_scale;
+        pixel.x = x*display_scale;
+        pixel.y = y*display_scale;
+
+        SDL_RenderFillRect(renderer, &pixel);
+        SDL_RenderDrawRect(renderer, &pixel);
+
       }
     }
-
-    SDL_RenderPresent(renderer);
-  }
+  }  
+  SDL_RenderPresent(renderer);
+  }  
   draw_flag = 0;
+
 }
 
 void stop_display(){

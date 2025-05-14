@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
     if(st > 0){
       --st;
     }
+    event_handler();
     run_cycle();
     draw_display(display);
-    event_handler();
     usleep(1500);
   }
 
