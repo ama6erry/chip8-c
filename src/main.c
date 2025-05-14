@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     run_cycle();
     draw_display(display);
     event_handler();
-    usleep(16600);
+    usleep(1500);
   }
 
   if(debug){

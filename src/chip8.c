@@ -199,44 +199,47 @@ void run_cycle(){
           V[(instruction & 0x0F00) >> 8] = x ^ y;
           break;
         case 0x0004:
+          V[(instruction & 0x0F00) >> 8] += y;
           if ((x + y) > 0xFF){
             V[0xF] = 1;
           } else {
             V[0xF] = 0;
           }
-          V[(instruction & 0x0F00) >> 8] += y;
           break;
         case 0x0005:
+          V[(instruction & 0x0F00) >> 8] -= y;
+          debuglog("setting register %d to %d - %d\n", (instruction & 0x0F00) >> 8, x, y);
           if (x > y){
+            debuglog("set flag to 1\n");
             V[0xF] = 1;
           } else {
+            debuglog("set flag to 0\n");
             V[0xF] = 0;
           }
-          V[(instruction & 0x0F00) >> 8] -= y;
           break;
         case 0x0006:
+          V[(instruction & 0x0F00) >> 8] >>= 1;
           if ((x & 0x01) == 1){
             V[0xF] = 1;
           } else {
             V[0xF] = 0;
           }
-          V[(instruction & 0x0F00) >> 8] >>= 1;
           break;
         case 0x0007:
-          if (x > y){
+          V[(instruction & 0x0F00) >> 8] = y - x;
+          if (y > V[(instruction & 0x0F00) >> 8]){
             V[0xF] = 1;
           } else {
             V[0xF] = 0;
           }
-          V[(instruction & 0x0F00) >> 8] = y - V[(instruction & 0x0F00) >> 8];
           break;
         case 0x000E:
-          if ((x & 0x80) == 1){
+          V[(instruction & 0x0F00) >> 8] <<= 1;
+          if ((x & 0x80) > 1){
             V[0xF] = 1;
           } else {
             V[0xF] = 0;
           }
-          V[(instruction & 0x0F00) >> 8] <<= 1;
           break;
       }
       break;
@@ -303,7 +306,7 @@ void run_cycle(){
               --st;
             }
             event_handler();
-            usleep(16600);
+            usleep(1500);
           } while (keyboard == 0x1F);
           V[(instruction & 0x0F00) >> 8] = keyboard;
           break;
