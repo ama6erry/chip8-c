@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <SDL.h>
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +14,10 @@ int main(int argc, char *argv[])
   int file_flag = 0;
   int result;
   char file_path[512];
+  double deltatime = 0;
+  double lastTime = SDL_GetTicks();
+  double displayAndDelayTracker = 0;
+  double executeTracker = 0;
 
   while((opt = getopt(argc, argv, "df:s:")) != -1) {
     switch (opt){
@@ -50,16 +56,30 @@ int main(int argc, char *argv[])
   memcpy(memory, fontset, sizeof(fontset));
 
   while(running){
-    if(dt > 0){
-      --dt;
-    }
-    if(st > 0){
-      --st;
-    }
+    double startTime = SDL_GetTicks();
+    deltatime = startTime - lastTime;
+    lastTime = startTime;
+    displayAndDelayTracker += deltatime;
+    executeTracker += deltatime;
+    
     event_handler();
-    run_cycle();
-    draw_display(display);
-    usleep(1500);
+
+    if(displayAndDelayTracker >= 16.67){
+      if(dt > 0){
+        --dt;
+      }
+      if(st > 0){
+        --st;
+      }
+      draw_display(display);
+      displayAndDelayTracker = 0;
+    }
+    
+    if(executeTracker >= 0.002){
+      run_cycle();
+      executeTracker = 0;
+    }
+
   }
 
   if(debug){

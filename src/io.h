@@ -9,6 +9,6 @@ void event_handler();
 extern int running;
 extern int draw_flag;
 extern int display_scale;
-extern unsigned char keyboard;
+extern unsigned char keyboard[0xF];
 
 #endif // IO_H

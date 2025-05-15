@@ -46,6 +46,7 @@ unsigned short stack[16] = {0};
 unsigned char memory[4096] = {0};
 unsigned char display[64][32] = {0};
 
+
 // Font set
 unsigned char fontset[80] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0,  // 0
@@ -121,6 +122,7 @@ void run_cycle(){
   pc += 2;
   debuglog("Current instruction: 0x%x\n", instruction);
 
+  int keypressed;
   //Extracting Vx and Vy which may or may not be used
   unsigned short x = V[(instruction & 0x0F00) >> 8];
   unsigned short y = V[(instruction & 0x00F0) >> 4];
@@ -282,12 +284,12 @@ void run_cycle(){
     case 0xE000:
       switch(instruction & 0x00FF){
         case 0x009E:
-          if(keyboard == x){
+          if(keyboard[x]){
             pc += 2;
           }
           break;
         case 0x00A1:
-          if(keyboard != x){
+          if(keyboard[x] == 0){
             pc += 2;
           }
           break;
@@ -299,17 +301,19 @@ void run_cycle(){
           V[(instruction & 0x0F00) >> 8] = dt;
           break;
         case 0x000A:
-          do {
-            if(dt > 0){
-              --dt;
+          keypressed = 0;
+          for(int i = 0; i < 0xF; i++){
+            if(keyboard[i]){
+              debuglog("key pressed - breaking out of loop\n");
+              keypressed = 1;
+              V[(instruction & 0x0F00) >> 8] = i;
+              break;
             }
-            if(st > 0){
-              --st;
-            }
-            event_handler();
-            usleep(1500);
-          } while (keyboard == 0x1F);
-          V[(instruction & 0x0F00) >> 8] = keyboard;
+          }
+          if(keypressed == 0){
+            pc -= 2;
+            debuglog("no key press detected - continuing loop, keypressed flag = %d\n", keypressed);
+          }
           break;
         case 0x0015:
           dt = x;
